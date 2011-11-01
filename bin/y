@@ -1,0 +1,8 @@
+#!/usr/bin/env ruby
+begin
+  require "ruby_yukkuri/client_cli"
+rescue LoadError
+  require "rubygems"
+  require "ruby_yukkuri/client_cli"
+end
+Yukkuri::ClientCLI.execute(ARGV)
