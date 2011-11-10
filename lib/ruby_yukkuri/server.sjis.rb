@@ -18,8 +18,8 @@ module Yukkuri
 
     def initialize(config = {}, &block)
       @config = {
-        :bouyomi_command => "BouyomiChan\\RemoteTalk\\RemoteTalk",
-        :softalk_command => "softalk\\SofTalk",
+        :bouyomi_command => "..\\..\\BouyomiChan\\RemoteTalk\\RemoteTalk",
+        :softalk_command => "..\\..\\softalk\\SofTalk",
         :host            => "localhost",
         :port            => 50100,
       }.merge(config)
@@ -33,11 +33,14 @@ module Yukkuri
       talk(message)
       DRb.start_service("druby://#{@config[:host]}:#{@config[:port]}", self)
       p DRb.uri
-      gets
+      STDIN.gets
     end
 
     def talk(str, args = "")
-      str = str.tosjis.gsub(/"/, "")
+      str = str.to_s.tosjis.gsub(/"/, "").strip
+      if str.empty?
+        return
+      end
       remote_talk("/Talk \"#{str}\" #{args}")
     end
 

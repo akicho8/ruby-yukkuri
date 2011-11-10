@@ -1,3 +1,4 @@
 .gitignore
 /README.html
 *.gem
+/*.sh

@@ -88,14 +88,14 @@ module Yukkuri
 
     def remote_talk(*args)
       safe_block(@config[:wait]) do
-        @object.remote_talk(*args).to_s.toutf8
+        remote_object.remote_talk(*args).to_s.toutf8
       end
     end
 
     private
 
     def safe_block(timeup)
-      if @error_count == 0 && @object
+      if @error_count == 0 && remote_object
         begin
           timeout(timeup) do
             yield
