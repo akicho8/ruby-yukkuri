@@ -18,10 +18,10 @@ module Yukkuri
 
     def initialize(config = {}, &block)
       @config = {
-        :bouyomi_command => "..\\..\\BouyomiChan\\RemoteTalk\\RemoteTalk",
-        :softalk_command => "..\\..\\softalk\\SofTalk",
-        :host            => "localhost",
-        :port            => 50100,
+        :bouyomi_command => command_find("BouyomiChan/RemoteTalk/RemoteTalk.exe"),
+        :softalk_command => command_find("softalk/SofTalk.exe"),
+        :host            => nil,
+        :port            => nil,
       }.merge(config)
 
       if block_given?
@@ -30,9 +30,16 @@ module Yukkuri
     end
 
     def start(message = "ok")
+      puts "BouyomiChan: #{@config[:bouyomi_command]}"
       talk(message)
-      DRb.start_service("druby://#{@config[:host]}:#{@config[:port]}", self)
-      p DRb.uri
+      if @config[:host]
+        uri = "druby://#{@config[:host]}:#{@config[:port]}"
+      else
+        uri = nil
+      end
+      DRb.start_service(nil, self)
+      puts DRb.uri
+      puts "[ENTER] to exit"
       STDIN.gets
     end
 
@@ -45,8 +52,8 @@ module Yukkuri
     end
 
     def remote_talk(args)
+      puts args
       command = "#{@config[:bouyomi_command]} #{args}"
-      puts command
       `#{command}`
     end
 
@@ -55,6 +62,22 @@ module Yukkuri
       command = "start #{@softalk_command} #{options[:softalk_options]} /W:\"#{str}\""
       puts command
       system(command)
+    end
+
+    def command_find(command)
+      found = nil
+      [
+        "~/Desktop",
+        ENV["ProgramFiles"],
+        ENV["ProgramFiles(x86)"],
+      ].each{|path|
+        path = Pathname(path).expand_path + command
+        if path.exist?
+          found = path
+          break
+        end
+      }
+      found
     end
   end
 end

@@ -8,7 +8,7 @@ module Yukkuri
     def self.execute(args)
       config = Yukkuri::Server.new.config
       oparser = OptionParser.new do |oparser|
-        oparser.version = "0.0.1"
+        oparser.version = "0.0.2"
         oparser.on("--bouyomi=COMMAND", "BouyomiChan Command (default: #{config[:bouyomi_command]})"){|config[:bouyomi_command]|}
         oparser.on("--softalk=COMMAND", "Softalk Command (default: #{config[:softalk_command]})"){|config[:softalk_command]|}
         oparser.on("--host=HOSTNAME", "Hostname (default: #{config[:host]})"){|config[:host]|}

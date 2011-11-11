@@ -8,6 +8,7 @@ require "drb/drb"
 require "timeout"
 require "ping"
 require "resolv"
+require "pathname"
 
 module Yukkuri
   class Client
@@ -20,10 +21,18 @@ module Yukkuri
 
     def initialize(config = {}, &block)
       @config = {
-        :host => "192.168.11.50",
-        :port => 50100,
-        :wait => 3,
+        # :host => "192.168.11.50",
+        # :host => "192.168.1.103",
+        # :port => 50100,
+        :voice  => 1,    # 音質(1-8)
+        :tone   => 100,  # 音程(50-200)
+        :volume => 100,  # 音量(1-100)
+        :speed  => -1,   # 速度(50-300)
+        :wait => 10,
+        :conf_file => Pathname("~/.ruby-yukkuri"),
       }.merge(config)
+
+      conf_file_read
 
       if block_given?
         yield @config
@@ -35,24 +44,16 @@ module Yukkuri
     def remote_object
       return @remote_object if @remote_object
       host_with_port = [@config[:host], @config[:port]].join(":")
-      if Ping::pingecho(@config[:host], 1, @config[:port])
+      if Ping::pingecho(@config[:host], 3, @config[:port])
         @remote_object = DRb::DRbObject.new_with_uri("druby://#{host_with_port}")
       else
-        raise "#{host_with_port} に接続できません"
+        puts "#{host_with_port} に接続できません"
+        abort
       end
     end
 
-    def default_talk_options
-      {
-        :voice  => 1,    # 音質(1-8)
-        :tone   => 100,  # 音程(50-200)
-        :volume => 100,  # 音量(1-100)
-        :speed  => -1,   # 速度(50-300)
-      }
-    end
-
     def talk(str, options = {})
-      options = default_talk_options.merge(options)
+      options = @config.merge(options)
       if options[:force]
         stop
       end
@@ -104,6 +105,13 @@ module Yukkuri
           @error_count += 1
           p error
         end
+      end
+    end
+
+    def conf_file_read
+      conf_file = @config[:conf_file].expand_path
+      if conf_file.exist?
+        eval(conf_file.expand_path.read, binding)
       end
     end
   end

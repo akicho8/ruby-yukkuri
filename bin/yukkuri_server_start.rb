@@ -1,5 +1,3 @@
-#!/usr/bin/env ruby
-
 filename = File.expand_path(File.join(File.dirname(__FILE__), "../lib/ruby_yukkuri/server_cli.sjis.rb"))
 if File.exists?(filename)
   require filename

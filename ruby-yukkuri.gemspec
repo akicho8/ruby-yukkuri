@@ -1,6 +1,6 @@
 Gem::Specification.new do |spec|
   spec.name = "ruby-yukkuri"
-  spec.version = "0.0.1"
+  spec.version = "0.0.2"
   spec.summary = "ruby yukkuri"
   spec.author = "akicho8"
   spec.homepage = "http://github.com/akicho8/ruby-yukkuri"
