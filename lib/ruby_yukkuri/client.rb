@@ -6,7 +6,6 @@
 require "kconv"
 require "drb/drb"
 require "timeout"
-require "ping"
 require "resolv"
 require "pathname"
 
@@ -44,12 +43,7 @@ module Yukkuri
     def remote_object
       return @remote_object if @remote_object
       host_with_port = [@config[:host], @config[:port]].join(":")
-      if Ping::pingecho(@config[:host], 3, @config[:port])
-        @remote_object = DRb::DRbObject.new_with_uri("druby://#{host_with_port}")
-      else
-        puts "#{host_with_port} に接続できません"
-        abort
-      end
+      @remote_object = DRb::DRbObject.new_with_uri("druby://#{host_with_port}")
     end
 
     def talk(str, options = {})
@@ -119,23 +113,18 @@ end
 
 if $0 == __FILE__
   object = Yukkuri::Client.new
-  object.talk("ちゃんと繋がってる。問題ない", :sync => false, :tone => 105, :voice => 9, :speed => 120, :volume => 100)
-  # object.talk("ちゃんと繋がってる。問題ない", :sync => false, :tone => 100, :voice => 1, :speed => 110, :volume => 50)
+  object.talk("繋がっています", :sync => false, :tone => 105, :voice => 9, :speed => 120, :volume => 100)
+  sleep(1)
+  object.talk("強制割込み。同期", :sync => true, :force => true) # 割り込み、発声、待ち
+  object.stop
 
-  # object.talk("こんにちは", :sync => false, :tone => 130, :voice => 2)
-  # object.talk("こんばんは", :sync => false, :tone => 100, :voice => 1)
-  # object.talk("ちゃんと繋がってる。問題ない", :sync => false, :tone => 100, :voice => 5)
-  # sleep(0.2)
-  # object.talk("強制割込み。同期", :sync => true, :force => true) # 割り込み、発声、待ち
-  # object.stop
-
-  # if ARGV.empty?
-  #   STDOUT.sync = true
-  #   loop do
-  #     print "> "
-  #     object.talk(gets.strip)
-  #   end
-  # else
-  #   object.talk(ARGV.to_s)
-  # end
+  if ARGV.empty?
+    STDOUT.sync = true
+    loop do
+      print "> "
+      object.talk(gets.strip)
+    end
+  else
+    object.talk(ARGV.to_s)
+  end
 end
